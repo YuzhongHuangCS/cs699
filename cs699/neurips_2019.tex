@@ -60,8 +60,8 @@ Recently, dramatic advancements have been made in many existing works, such as D
 As a matter of fact, a vast majority of these methods that stem from random walk significantly depend on settings of their hyper-parameters, such as the length of walk $C$ that may vary among different graphs. As a result, the tuning of $C$ involves tremendous trial-and-error and is ususally time-consuming.
 Fortunately, WatchYourStep~\cite{} extends a pre-defined $C$ to a trainable attention-based context distribution parametrized leveraging a learnable vector $\mathbf{Q}$, which aims to capture the subtle but non-trivial heterogeneity hidden in topology through an automatic manner. Such a graph attention model manages to reduce the error by 20\% to 40\%~\cite{}.
 
-In spite of its capacity of considering the dissimilarity of different graphs, WatchYourStep fails to take the difference between nodes into consideration. Indeed, nodes from the same graph may have distinct characteristics and thus play distinct roles. For example, a small number of nodes can have much higher degree than any other nodes. 
-
+In spite of its capacity of considering the dissimilarity of different graphs, WatchYourStep fails to take the difference between nodes into consideration. Indeed, nodes from the same graph may have distinct characteristics and thus play distinct roles. 
+%For example, a small number of nodes can have much higher degree than any other nodes. 
 For example, some nodes with a higher degree may have a larger context to look at while other more disconnected nodes may have a smaller one. As a matter of fact, a global context distribution presumes the homogeneity over various nodes, which tend to not hold water. In contrast, our method endows each node with sufficient autonomy to explore their personalized optimal context distribution parametrized by only a few learnable parameters, the quantity of which is fairly tractable.
 
 
