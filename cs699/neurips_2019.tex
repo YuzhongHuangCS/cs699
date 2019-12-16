@@ -27,6 +27,7 @@
 \usepackage{microtype}      % microtypography
 \usepackage{multirow}
 \usepackage{bbm}
+\usepackage{graphicx}
 
 \title{Graph Embedding with Personalized Context Distribution}
 
@@ -49,42 +50,46 @@ Di Huang, Yuzhong Huang, Kexuan Sun, Zihao He}
 \maketitle
 
 \begin{abstract}
-Graph representation 
-
-
-    We propose a graph embedding method with node-personalized context distribution. 
+Graph representation learning is a task of embedding graph nodes in a low-dimensional latent space with vectors. 
+%Especially random walk based approaches gained traction for its scalability for large-scale graphs while preserving high-order proximity. 
+However, real networks vary in size and structural properties. Heavily relying on hyper-parameters, certain random walk based approaches are not easily applicable due to its long hyper-parameter searching process. In this work, we improve WatchYourStep and learn graph embedding via a node-personalized context attention learning process. We replace the sharing context distribution with learnable personalized context distribution for each individual node. We evaluate our model on seven real networks and show that our methods outperforms state-of-the-art WatchYourStep on both link prediction and node classification tasks. We further provide analysis on learnt node context distribution and its correlation with graph structural properties.
 \end{abstract}
 
 \section{Introduction}
 
-Graph embedding consists of vector representation for each node in the graph, while preserving its structure information. The usefulness of graph embeddings has been shown in various downstream applications, such as node classification and link prediction. Therefore, there have been dramatic advancements in learning graph embedding, such as DeepWalk~\cite{} and node2vec~\cite{}.
+Graph embedding aims to learn a vector representation for each node in the graph, while preserving its structure information. Such embedding can been used in various downstream applications, such as node classification, link prediction and graph. Existing works can be divided into three main categories: matrix factorization, randon walks and deep learning models. Random walks based methods such as DeepWalk~\cite{perozzi2014deepwalk} and Node2vec~\cite{grover2016node2vec} especially gained great attraction for its scalability for large-scale graphs while preserving high-order proximity.
 
-However, since many of these methods stem from random walk, they significantly depend on settings of their hyper-parameters such as the length of walk $C$ which may vary on different graphs. Fortunately, WatchYourStep~\cite{} extends a fixed value of $C$ to a trainable attention-based context distribution $Q$. Regardless of its efficiency on various tasks, it focuses on the difference between graphs but does not take the difference between nodes into consideration. Indeed, nodes from the same graph may have distinct characteristics and thus play distinct roles. For example, a small number of nodes can have much higher degree than any other nodes.
-
-Instead of learning an attention-based context distribution for a graph, we therefore propose a graph embedding method that learns a context distribution for each individual node. We parameterize a context distribution into three different formats and compare them with other state-of-the-art graph embedding methods on both link prediction and node classification tasks. The experimental results indicate the superiority of our proposed method and may also potentially open up a new research direction in other domains such as natural language processing. 
-
-HZH
-
-Graph embedding aims to learn a vector representation of each node in graph, while preserving its structural information. Its usefulness has been demonstrated in various downstream applications such as node classification~\cite{} and link prediction~\cite{}.
-Recently, dramatic advancements in graph embedding have been made in many existing works, such as DeepWalk~\cite{} and node2vec~\cite{}. 
-% The usefulness of graph embeddings has been shown in various downstream applications, such as node classification and link prediction. Therefore, there have been dramatic advancements in learning graph embedding, such as DeepWalk~\cite{} and node2vec~\cite{}.
+% However, since many random walk based approaches significantly depend on their hyper-parameters settings such as the length of walk $C$ which may vary on different graphs. To solve such bottleneck, WatchYourStep~\cite{abu2018watch} extends a fixed value of $C$ to a trainable attention-based context distribution $\mathbf{Q}$. Regardless of its efficiency on various tasks, it focuses on the difference between graphs but does not take the difference between nodes into consideration. Indeed, nodes from the same graph may have distinct characteristics and thus play distinct roles. For example, a small number of nodes can have much higher degree than any other nodes. Ignoring such heterogeneity is prone to cause a inferior performance.
 
 As a matter of fact, a vast majority of these methods that stem from random walk significantly depend on settings of their hyper-parameters, such as the length of walk $C$ that may vary among different graphs. As a result, the tuning of $C$ involves tremendous trial-and-error and is usually time-consuming.
-Fortunately, WatchYourStep~\cite{} extends a pre-defined $C$ to a trainable attention-based context distribution parametrized by a learnable vector $\mathbf{Q}$, which aims to capture the subtle but non-trivial heterogeneity hidden in topology through an automatic manner. Such a graph attention model manages to achieve significant error reduction in different tasks~\cite{}.
+To solve such a bottleneck, WatchYourStep~\cite{abu2018watch} extends a pre-defined $C$ to a trainable attention-based context distribution parametrized by a learnable vector $\mathbf{Q}$, which aims to capture the subtle but non-trivial heterogeneity hidden in topology through an automatic manner. 
 
 In spite of its capacity of considering the dissimilarity of different graphs, WatchYourStep fails to take the difference between nodes into consideration. Indeed, nodes from the same graph may play different roles displaying distinct characteristics, including the length of walk $C$. For example, a small number of nodes can have much higher degree than other nodes in a graph. Ignoring such heterogeneity is prone to cause a inferior performance.
-% For example, some nodes with a higher degree may have a larger context to look at while other more disconnected nodes may have a smaller one. As a matter of fact, a global context distribution presumes the homogeneity over various nodes, which tend to not hold water. In contrast, our method endows each node with sufficient autonomy to explore their personalized optimal context distribution parametrized by only a few learnable parameters, the quantity of which is fairly tractable.
 
-To this end, in this paper, instead of learning an attention-based context distribution for the entire graph, we therefore propose a graph embedding method that learns a context distribution for each individual node. Specifically, we parametrize a context distribution into three different forms and compare them with other state-of-the-art graph embedding methods on both link prediction and node classification tasks. Extensive experimental results indicate the superiority of our proposed method on both link prediction and node classification, which may also potentially open up a new research direction in other domains involving embedding learning such as natural language processing. 
+Instead of learning an attention-based context distribution for a graph, we therefore propose a graph embedding method that learns a context distribution for each individual node. We parameterize a context distribution into three different formats and compare them with other state-of-the-art graph embedding methods on both link prediction and node classification tasks. The experimental results indicate the superiority of our proposed method. Furthermore, we provide analysis on learnt node context distribution and its correlation with graph structural properties, which may also potentially open up a new research direction in other embedding learning relate domains such as natural language processing. 
 
+
+% HZH
+
+% Graph embedding aims to learn a vector representation of each node in graph, while preserving its structural information. Its usefulness has been demonstrated in various downstream applications such as node classification~\cite{} and link prediction~\cite{}.
+% Recently, dramatic advancements in graph embedding have been made in many existing works, such as DeepWalk~\cite{} and node2vec~\cite{}. 
+% % The usefulness of graph embeddings has been shown in various downstream applications, such as node classification and link prediction. Therefore, there have been dramatic advancements in learning graph embedding, such as DeepWalk~\cite{} and node2vec~\cite{}.
+
+% As a matter of fact, a vast majority of these methods that stem from random walk significantly depend on settings of their hyper-parameters, such as the length of walk $C$ that may vary among different graphs. As a result, the tuning of $C$ involves tremendous trial-and-error and is usually time-consuming.
+% Fortunately, WatchYourStep~\cite{} extends a pre-defined $C$ to a trainable attention-based context distribution parametrized by a learnable vector $\mathbf{Q}$, which aims to capture the subtle but non-trivial heterogeneity hidden in topology through an automatic manner. Such a graph attention model manages to achieve significant error reduction in different tasks~\cite{}.
+
+% In spite of its capacity of considering the dissimilarity of different graphs, WatchYourStep fails to take the difference between nodes into consideration. Indeed, nodes from the same graph may play different roles displaying distinct characteristics, including the length of walk $C$. For example, a small number of nodes can have much higher degree than other nodes in a graph. Ignoring such heterogeneity is prone to cause a inferior performance.
+% % For example, some nodes with a higher degree may have a larger context to look at while other more disconnected nodes may have a smaller one. As a matter of fact, a global context distribution presumes the homogeneity over various nodes, which tend to not hold water. In contrast, our method endows each node with sufficient autonomy to explore their personalized optimal context distribution parametrized by only a few learnable parameters, the quantity of which is fairly tractable.
+
+% To this end, in this paper, instead of learning an attention-based context distribution for the entire graph, we therefore propose a graph embedding method that learns a context distribution for each individual node. Specifically, we parametrize a context distribution into three different forms and compare them with other state-of-the-art graph embedding methods on both link prediction and node classification tasks. Extensive experimental results indicate the superiority of our proposed method on both link prediction and node classification, which may also potentially open up a new research direction in other domains involving embedding learning such as natural language processing. 
 \section{Methodology}
 
 
 \subsection{Objective Function}
-Similar with WatchYourStep, we use negative log graph likelihood(NLGL) as our log function:
+Similar to WatchYourStep, we use negative log graph likelihood(NLGL) as our log function:
 
 $\displaystyle\min_{\mathbf{L},\mathbf{R},\mathbf{Q}}\alpha(\|\mathbf{L}\|_2^2 + \|\mathbf{R}\|_2^2 ) + \beta\|\mathbf{Q}\|_2^2 +\|-\mathbb{E}[\mathbf{D};\mathbf{Q}]\circ\log(\sigma(\mathbf{L}\times\mathbf{R}^\intercal)) -\mathbbm{1}[\mathbf{A}=0]\circ\log(1-\sigma(\mathbf{L}\times\mathbf{R}^\intercal)) \|_1$
-where $\mathbb{E}[\mathbf{D};\mathbf{Q}] = \tilde{\mathbf{P}}^{(0)}\displaystyle\sum_{k=1}^{C}p(Q)_k(\mathcal{T})^k$. A is graph adjacent matrix and $\tilde{\mathbf{P}}^{(0)}$ is diagonal matrix notifying start points of random walks. $\mathbf{L}, \mathbf{R} \in \mathbb{R}^{|V|\times \frac{d}{2}}$ are left and right embedding respectively. They can be independently learnt or be equal. $\alpha \in \mathbb{R}$, $\beta \in \mathbb{R}$ are regularization coefficients for embedding and attention parameters. Instead of simulating random walks to calculate co-occurrence matrix $\mathbf{D}$ such as Node2Vec, we use transition matrix $\mathcal{T}$ to calculate $\mathbb{E}[\mathbf{D};\mathbf{Q}]$, the expectation of $\mathbf{D}$ between nodes on random walks. $\mathbf{Q}$ is defined as distribution parameters and $p(\mathbf{Q})$ is context distribution. 
+where $\mathbb{E}[\mathbf{D};\mathbf{Q}] = \tilde{\mathbf{P}}^{(0)}\displaystyle\sum_{k=1}^{C}p(Q)_k(\mathcal{T})^k$. A is graph adjacency matrix and $\tilde{\mathbf{P}}^{(0)}$ is diagonal matrix notifying start points of random walks. $\mathbf{L}, \mathbf{R} \in \mathbb{R}^{|V|\times \frac{d}{2}}$ are left and right embedding respectively. They can be independently learnt or be equal. $\alpha \in \mathbb{R}$, $\beta \in \mathbb{R}$ are regularization coefficients for embedding and attention parameters. Instead of simulating random walks to calculate co-occurrence matrix $\mathbf{D}$ such as Node2Vec, we use transition matrix $\mathcal{T}$ to calculate $\mathbb{E}[\mathbf{D};\mathbf{Q}]$, the expectation of $\mathbf{D}$ between nodes on random walks. $\mathbf{Q}$ is defined as distribution parameters and $p(\mathbf{Q})$ is context distribution. 
 
 \subsection{Attention Distribution}
 We formulate distribution parameter $\mathbf{Q}$ and its mechanism to learn personalized context distribution $p(\mathbf{Q})$ in three ways as below.
@@ -93,16 +98,16 @@ We formulate distribution parameter $\mathbf{Q}$ and its mechanism to learn pers
 $\mathbf{Q} \in \mathbb{R}^{|V|\times{C}}$ is a trainable parameter learned by the model. $p(\mathbf{Q}) = \text{softmax}(Q)$. There is no constraint on the learned attention distribution.
 
 \textbf{Exponential distribution}.
-Each row in $\mathbf{Q}$ is derived from an exponential distribution, parameterized by $\mathbf{q_i}$. For node $i$, $\mathbf{Q_i} = (\mathbf{q_i}^0, \mathbf{q}_i^1, \mathbf{q}_i^2, \cdots, \mathbf{q}_i^{C-1})$, $\mathbf{q}_i>0$. $p(\mathbf{Q_i}) = \frac{\mathbf{Q_i}}{\sum \mathbf{Q_i}}$. We use sum normalize instead of softmax to maintain $p(\mathbf{Q_i})$ as an exponential distribution. Depends on the value of $\mathbf{q}_i$, it could be monotonically increasing or decreasing.
+Each row in $\mathbf{Q}$ is derived from an exponential distribution, parameterized by $\mathbf{q_i}$. For node $i$, $\mathbf{Q_i} = (\mathbf{q_i}^0, \mathbf{q}_i^1, \mathbf{q}_i^2, \cdots, \mathbf{q}_i^{C-1})$, $\mathbf{q}_i>0$. $p(\mathbf{Q_i}) = \frac{\mathbf{Q_i}}{\sum \mathbf{Q_i}}$. We use sum normalization instead of softmax to maintain $p(\mathbf{Q_i})$ as an exponential distribution. Depending on the value of $\mathbf{q}_i$, it could be monotonically increasing or decreasing.
 
 \textbf{Quadratic distribution}.
-Each row in $\mathbf{Q}$ is derived from a quadratic distribution, parameterized by $\mathbf{a_i, b_i, c_i}$. Denote $f_i(x) = a_ix^2+b_ix+c_i$. Then for node i, $\mathbf{Q_i} = (f_i(1), f_i(2), f_i(3), \cdots, f_i(C))$. $p(\mathbf{Q_i}) = \text{softmax}(\mathbf{Q_i})$. Depends on the value of $a_i, b_i, c_i$, it could be monotonically increasing, decreasing, or non-monotonic.
+Each row in $\mathbf{Q}$ is derived from a quadratic distribution, parameterized by $\mathbf{a_i, b_i, c_i}$. Denote $f_i(x) = a_ix^2+b_ix+c_i$. Then for node i, $\mathbf{Q_i} = (f_i(1), f_i(2), f_i(3), \cdots, f_i(C))$. $p(\mathbf{Q_i}) = \text{softmax}(\mathbf{Q_i})$. With different values of $a_i, b_i, c_i$, it could be monotonically increasing, decreasing, or non-monotonic.
 
-We also explore other forms of attention distribution, like gamma distribution, or more generally, a function of node embedding. Due to their mediocre experiment results and space limit, we do not include them in the discussion.
+We also explored other forms of attention distribution, like gamma distribution, or more generally, a function of node embedding. Due to their mediocre experiment results and space limit, we do not include them in the discussion.
 
 \section{Experiments And Analysis}
 \subsection{Data Description}
-As shown in Table \ref{tab:datasets}, we select 7 benchmark graphs for link prediction and node classification tasks. PPI is a network of biological interactions between proteins and labels are the functionality of proteins. Cora, Citeseer and Ca-Hepth are citation networks between scientific publications. Wikipedia is the cooccurrence network of words appearing in the first million bytes of Wikipedia dump while the labels are Part-of-Speech(POS) tags. Wikivote is a voting network between Wikipedia users. Soc-facebook contains social circles(friends list) on Facebook. 
+As shown in Table \ref{tab:datasets}, we select 7 benchmark graphs for link prediction and node classification tasks: Citeseer and Ca-Hepth are citation networks between scientific publications; Wikipedia is the co-occurrence network of words appearing in the first million bytes of Wikipedia dump while the labels are Part-of-Speech (POS) tags; Wikivote is a voting network between Wikipedia users; Soc-facebook contains social circles (friends list) on Facebook. 
 
 \begin{table}[ht]
 \caption{Statistics of benchmark datasets in the experiment}
@@ -127,23 +132,24 @@ Soc-facebook & 4,039 & 88,234 & Undirected & -\\
 \subsection{Baseline Graph Embedding Methods}
 
 
-\textbf{HOPE}: It learns node embedding by minimizing $||S - Y_sY_t^\intercal||_F^2$, where $S$ is similarity matrix between nodes. $S$ can be measured using different similarity metrics such as Katz Index, Rooted Page Rank. 
+\textbf{HOPE\cite{ou2016asymmetric}} learns graph embedding by minimizing $||S - Y_sY_t^\intercal||_F^2$, where $S$ is a similarity matrix between nodes. $S$ can be measured using different similarity metrics such as Katz Index, Rooted Page Rank. 
 
-\textbf{Node2Vec}: It is a random walk based  approach with two parameters controlling walk directions. It preserves the high-order proximity between nodes by maximizing the probability of node co-occurrence on fixed-length walks. 
+\textbf{Node2Vec} is a random walk based approach with two parameters controlling walk directions. It preserves the high-order proximity between nodes by maximizing the probability of node co-occurrence on fixed-length walks. 
 
-\textbf{WatchYourStep}: Built upon random walk method, it replaces context hyper-parameters such as walk length and the number of walks with a shared trainable attention vector to learn context distributions.
+\textbf{WatchYourStep} is built upon random walk method, it replaces context hyper-parameters such as walk length and the number of walks with a shared trainable attention vector to learn context distributions.
 
 
 
 
 \subsection{Experiment Setup And Evaluation Metrics}
-We evaluate the generated embedding with personalized attention on two tasks -- link prediction and node classification. We keep embedding dimension as 128 for all embedding methods. In random walks based methods node2vec,  the window size in random walks of 10. We use 80 random walks starting from each node. For link prediction, we hide 50\% links on the original graph for test and embed the graph with the rest 50\% edges as training. In node classification, we generate node embedding from the original graph without edge splitting. Then we use embedding of 70\% training nodes as feature vectors and apply logistic regression as classifier to predict labels for 30\% test nodes. We use MAP to evaluate link prediction and Macro-F1/Micro-F1 to evaluate node classification respectively. Since splitting training and testing sets utilizes a random number generator, we run 5 times varying its seed and report the average scores from all runs.
+We evaluate our proposed graph embedding method on two tasks -- link prediction and node classification. We keep embedding dimension as 128 for all embedding methods. In random walks based methods node2vec, the window size in random walks of 10. We use 80 random walks starting from each node. For link prediction, we hide 50\% links on the original graph for test and embed the graph with the rest 50\% edges for training. In node classification, we generate node embedding from the original graph without edge splitting. Then we use embedding of 70\% training nodes as feature vectors and apply logistic regression as classifier to predict labels for the rest 30\% test nodes. We use MAP to evaluate link prediction and Macro-F1/Micro-F1 to evaluate node classification respectively. Since splitting training and testing sets utilizes a random number generator, we run 5 times varying its seed and report the average scores from all runs.
 
 
 % We use Adam \ref{} optimizer with a learning rate of 0.2. We choose the weight decay to be 1e-6. The regularization number $\alpha$ for the adjacency matrix is 0.5. Unless otherwise specified. During training, the maximum iteration is 1,000 and we stop the training if the best training loss stagnates for more than 100 iterations. 
  
  %% MAP is correct. Please make sure all letters are capital. I haven't seen mAP.
-\textbf{MAP}(Mean Average Precision). It computes the average prediction precision across all nodes. $MAP=\frac{\sum_i AP(i)}{|V|}$,
+\textbf{MAP} (Mean Average Precision) computes the average prediction precision across all nodes as 
+$ MAP=\frac{\sum_i AP(i)}{|V|}$,
 where $AP(i) = \frac{\sum_{k=1}^K P@k(i) \cdot \mathbb{I}\{E_{pred_i}(k) \in E_{obs_i}\}}{|\{k: E_{pred_i}(k) \in E_{obs_i}\}|}$, $P@k(i) = \frac{|E_{pred_i}(1:k) \cap E_{obs_i}|}{k}$, $E_{pred_i}$ and $E_{obs_i}$ are the predicted and observed edges for node $i$ respectively. We set $K=100$ in our experiments.
 
 \textbf{Micro-F1/Macro-F1}. In multi-label classification, Macro-F1 is the average F1 score of all classes while Micro-F1 is defined as global F1 score by calculating the total true positives, false negatives and false positives with equal weight on each class.
@@ -152,12 +158,11 @@ where $AP(i) = \frac{\sum_{k=1}^K P@k(i) \cdot \mathbb{I}\{E_{pred_i}(k) \in E_{
 
  
 \subsection{Link Prediction}
-In this task, independent left and right embedding are used for each node.
-Table \ref{tab:results_lp} shows the results of link prediction for all compared methods with regard to mAP.
-We found personalized freeform attention method is better than WatchYourStep, but is still not optimal. One reason is it does not have any constraint on the learned attention distribution, so it is prone to over-fit, and for some less visited nodes, it don't have enough data to learn a good distribution. Instead, our proposed personalized exponential attention is superior on most datasets.
+In this task, we use independent left and right embedding for each node .
+Table \ref{tab:results_lp} shows the results of link prediction for all methods with regard to MAP. We find that personalized freeform attention method outperforms WatchYourStep, but is still not optimal. Partially because it does not have any constraint on the learned attention distribution, so it is prone to overfitting with a large number of parameters.  Instead, our proposed personalized exponential attention is superior to most datasets.
 
 \begin{table}
-\caption{MAP of link prediction using different embedding methods}
+\caption{MAP of link prediction using different embedding methods.}
 \label{tab:results_lp}
 \centering
 \begin{tabular}{cccc|ccc}
@@ -178,11 +183,10 @@ Soc-facebook & 41.48  & 22.47 & 53.77 & 51.82 & \textbf{54.37} & 52.62\\
 \end{table}
 
 
-
 \subsection{Node Classification}
-In this task, a shared left and right embedding are used for directed graph, independent left and right embedding are used for undirected graph.
+In this task, a shared left and right embedding are used for directed graph, and independent left and right embedding are used for undirected graph.
 Table \ref{tab:results_nc} shows the results of node classification for all compared methods with regard to Micro-F1/Macro-F1.
-We found the optimal form of attention is different on different tasks and datasets. The proposed personalized quadratic attention generally works better, since it allow non-monotonic distribution of the attention weights.
+We found the optimal form of attention is different on different tasks and datasets. The proposed personalized quadratic attention generally achieves a more satisfactory performance, since it allows non-monotonic distribution of the attention weights. In other words, some nodes may need to look at further nodes instead of its direct neighbors. 
 
 \begin{table}
 \caption{Micro-F1/Macro-F1 of node classification using different embedding methods}
@@ -205,19 +209,29 @@ Wikipedia & 41.98/3.90  & 41.21/4.44 & 43.81/8.26 & 44.03/8.41 & 44.86/8.36 & \t
 
 \subsection{Personalized Context Analysis}
 
-From Table \ref{tab:results_lp} and Table \ref{tab:results_nc}, we can see that graph embedding methods with personalized context distribution significantly outperform the global method. We argue that the superiority of our method stems from the dissimilarity of nodes in a graph. For example, some nodes with a higher degree may have a larger context to look at while other more disconnected nodes may have a smaller one. As a matter of fact, a global context distribution presumes the homogeneity over various nodes, which tend to not hold water. In contrast, our method endows each node with sufficient autonomy to explore their personalized optimal context distribution parametrized by only a few learnable parameters, the quantity of which is fairly tractable.
+From Table \ref{tab:results_lp} and Table \ref{tab:results_nc}, we can see that graph embedding methods with personalized context distribution significantly outperform the global attention method. We argue that the superiority of our method stems from the dissimilarity of nodes in a graph. For example, some nodes with a higher degree may have a larger context to look at while other more disconnected nodes may have a smaller one. As a matter of fact, a global context distribution presumes the homogeneity over various nodes, which tend to not hold water. In contrast, our method endows each node with sufficient autonomy to explore their personalized optimal context distribution parametrized by only a few learnable parameters, the quantity of which is fairly tractable.
 
-To delve deeper into what vantage our personalized embedding methods provide for each node, we visualize the statistics of the parameters learned by personalized exponential distribution and personalized quadratic distribution, as shown in Figure \ref{} and Table \ref{}.
+To delve deeper into what vantage our personalized embedding methods provide for each node, we display the statistics of the parameters learned by personalized exponential distribution
+in Table \ref{tab:analysis_q}. We then visualize the statistics as shown in Figure \ref{fig:dist_q}.
 % Table for each combination of parameters, table for statistics (mean, average, and etc) of those parameters.
 
-\textbf{Analysis of personalized exponential distribution.} 
-From Table \ref{tab:analysis_q}
+\textbf{Analysis of personalized personalized exponential attention.} 
+Table \ref{tab:analysis_q} shows the statistics of $q$ learned from our method. It is obvious that for each dataset, $q$ varies significantly for different nodes. For example, for PPI dataset, the majority of $q$s cluster around zero, which indicates most nodes focus only on its direct neighbor nodes. Such a ``only direct neighbor'' attention goes to a extreme on Wikipedia dataset. Surprisingly, from Table \ref{tab:analysis_q}, the maximum value of q exceeds 1 which indicates a monotonous attention distribution conditioned on distance.
+However, for Citeseer dataset, $q$s shift to 0.3, which means a milder decrease on attention when the distance increases.
+As a matter of fact, except soc-facebook dataset, Kurtosis values of all datasets are positive. A higher Kurtosis value of a dataset indicates more frequent extreme deviations, i.e. outliers, among its nodes.
+In addition, different datasets may have different distributions of $q$. As they are shown in Fig. \ref{fig:dist_q}, while the $q$s of almost all nodes are smaller than $0.1$ for wikipedia, those for soc-facebook are distributed nearly evenly between $0.0$ and $0.25$. Obviously, gl
 
 \begin{figure}
     \centering
-    \includegraphics{}
-    \caption{Caption}
-    \label{fig:my_label}
+    \includegraphics[width=0.245\textwidth]{cs699/fig/ppi.pdf}
+    \includegraphics[width=0.245\textwidth]{cs699/fig/cora.pdf}
+    \includegraphics[width=0.245\textwidth]{cs699/fig/citeseer.pdf}\\
+    \includegraphics[width=0.245\textwidth]{cs699/fig/wikipedia.pdf}
+    \includegraphics[width=0.245\textwidth]{cs699/fig/ca-HepTh.pdf}
+    \includegraphics[width=0.245\textwidth]{cs699/fig/wiki-vote.pdf}
+    \includegraphics[width=0.245\textwidth]{cs699/fig/soc-facebook.pdf}
+    \caption{Distribution of q in different datasets}
+    \label{fig:dist_q}
 \end{figure}
 
 \begin{table}
@@ -240,13 +254,39 @@ Soc-facebook & 5e-4  & 0.33 & 0.12 & 0.12 & 0.03 & -0.92 \\
 \end{tabular}
 \end{table}
 
-\textbf{Analysis of personalized quadratic distribution.} blablabla
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{cs699/fig/degree_q.pdf}
+    \caption{Linear regression between node degree and q on PPI dataset with y-axis on logrithmic scale. $R^2$ is 0.57.}
+    \label{fig:degree_q}
+\end{figure}
+
+% From Fig. \ref{fig:degree_q}, XXX. PPI dataset, y is log scaled. pearsonr = 0.57, p = 0 means it's very likely node degree is correlated with q.
+
+From Figure \ref{fig:degree_q}, we can see a very strong linear correlation between the attention distribution and its degree. Specifically, a higher exponential base $q$ demonstrates a node's more moderate decrease on attention on its further neighbors, which leads to a larger window size. Consequently, the conclusion here is that a hub (with higher degree) is prone to attend to more of its neighbors while more disconnected nodes bear more resemblance to its direct neighbors.
+
+\textbf{Analysis of personalized quadratic distribution.}
+Quadratic function allow non-monotonic distribution of attention score.
+From Figure. \ref{fig:dist_mirror}
+Inc is monotonic increasing, Dec is 
+\begin{figure}
+    \centering
+    \includegraphics[width=0.245\textwidth]{cs699/fig/ppi_quad.pdf}
+    \includegraphics[width=0.245\textwidth]{cs699/fig/cora_quad.pdf}
+    \includegraphics[width=0.245\textwidth]{cs699/fig/citeseer_quad.pdf}\\
+    \includegraphics[width=0.245\textwidth]{cs699/fig/wikipedia_quad.pdf}
+    \includegraphics[width=0.245\textwidth]{cs699/fig/ca-HepTh_quad.pdf}
+    \includegraphics[width=0.245\textwidth]{cs699/fig/wiki-vote_quad.pdf}
+    \includegraphics[width=0.245\textwidth]{cs699/fig/soc-facebook_quad.pdf}
+    \caption{Distribution of axis of symmetry in quadratic distribution}
+    \label{fig:dist_mirror}
+\end{figure}
 
 
 \section{Conclusions and Future Work}
-In this paper, we proposed a graph embedding method which extends WatchYourStep by personalizing context distribution for each individual node. We demonstrate the superiority of our method by evaluating the learned embedding on two downstream tasks: link prediction and multi-class node classification. In both tasks, our method outperforms all other compared methods on all benchmark datasets. 
+In this paper, we propose a graph embedding method which extends WatchYourStep by personalizing context distribution for each individual node. We demonstrate the superiority of our method by evaluating the learned embedding on two downstream tasks: link prediction and multi-class node classification. In both tasks, our method outperforms all other compared methods on all benchmark datasets. 
 
-One possible future work is to initialize embedding of each node based on its role in the graph. Another direction of future work is to apply our method in other domains such as natural language processing. For example, word embedding can be potentially learned in a personalized way.
+One possible future work is to initialize embedding of each node based on its role in the graph. Another direction of future work is to apply our method to other domains which involve embedding learning such as natural language processing. For example, word embedding can be potentially learned in a personalized way.
 
 % Please read the instructions below carefully and follow them faithfully.
 
@@ -536,7 +576,7 @@ One possible future work is to initialize embedding of each node based on its ro
 % go at the end of the paper. Do not include acknowledgments in the anonymized
 % submission, only in the final paper.
 
-\section*{References}
+%\section*{References}
 
 % References follow the acknowledgments. Use unnumbered first-level heading for
 % the references. Any choice of citation style is acceptable as long as you are
@@ -547,9 +587,7 @@ One possible future work is to initialize embedding of each node based on its ro
 
 \small
 
-[1] Alexander, J.A.\ \& Mozer, M.C.\ (1995) Template-based algorithms for
-connectionist rule extraction. In G.\ Tesauro, D.S.\ Touretzky and T.K.\ Leen
-(eds.), {\it Advances in Neural Information Processing Systems 7},
-pp.\ 609--616. Cambridge, MA: MIT Press.
+\bibliographystyle{abbrv}
+\bibliography{cs699}
 
 \end{document}
