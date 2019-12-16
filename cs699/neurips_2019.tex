@@ -49,23 +49,33 @@ Di Huang, Yuzhong Huang, Kexuan Sun, Zihao He}
 \maketitle
 
 \begin{abstract}
+Graph representation 
+
+
     We propose a graph embedding method with node-personalized context distribution. 
 \end{abstract}
 
 \section{Introduction}
-The efficacy of graph embedding, which entails vector representation for each node in the graph while preserving its structural information, has been demonstrated in various downstream applications such as node classification~\cite{} and link prediction~\cite{}.
-Recently, dramatic advancements have been made in many existing works, such as DeepWalk~\cite{} and node2vec~\cite{}. 
-% The usefulness of graph embeddings has been shown in various downstream applications, such as node classification and link prediction. Therefore, there have been dramatic advancements in learning graph embedding, such as DeepWalk~\cite{} and node2vec~\cite{}.
 
-As a matter of fact, a vast majority of these methods that stem from random walk significantly depend on settings of their hyper-parameters, such as the length of walk $C$ that may vary among different graphs. As a result, the tuning of $C$ involves tremendous trial-and-error and is ususally time-consuming.
-Fortunately, WatchYourStep~\cite{} extends a pre-defined $C$ to a trainable attention-based context distribution parametrized leveraging a learnable vector $\mathbf{Q}$, which aims to capture the subtle but non-trivial heterogeneity hidden in topology through an automatic manner. Such a graph attention model manages to reduce the error by 20\% to 40\%~\cite{}.
+Graph embedding consists of vector representation for each node in the graph, while preserving its structure information. The usefulness of graph embeddings has been shown in various downstream applications, such as node classification and link prediction. Therefore, there have been dramatic advancements in learning graph embedding, such as DeepWalk~\cite{} and node2vec~\cite{}.
 
-In spite of its capacity of considering the dissimilarity of different graphs, WatchYourStep fails to take the difference between nodes into consideration. Indeed, nodes from the same graph may have distinct characteristics and thus play distinct roles. 
-%For example, a small number of nodes can have much higher degree than any other nodes. 
-For example, some nodes with a higher degree may have a larger context to look at while other more disconnected nodes may have a smaller one. As a matter of fact, a global context distribution presumes the homogeneity over various nodes, which tend to not hold water. In contrast, our method endows each node with sufficient autonomy to explore their personalized optimal context distribution parametrized by only a few learnable parameters, the quantity of which is fairly tractable.
-
+However, since many of these methods stem from random walk, they significantly depend on settings of their hyper-parameters such as the length of walk $C$ which may vary on different graphs. Fortunately, WatchYourStep~\cite{} extends a fixed value of $C$ to a trainable attention-based context distribution $Q$. Regardless of its efficiency on various tasks, it focuses on the difference between graphs but does not take the difference between nodes into consideration. Indeed, nodes from the same graph may have distinct characteristics and thus play distinct roles. For example, a small number of nodes can have much higher degree than any other nodes.
 
 Instead of learning an attention-based context distribution for a graph, we therefore propose a graph embedding method that learns a context distribution for each individual node. We parameterize a context distribution into three different formats and compare them with other state-of-the-art graph embedding methods on both link prediction and node classification tasks. The experimental results indicate the superiority of our proposed method and may also potentially open up a new research direction in other domains such as natural language processing. 
+
+HZH
+
+Graph embedding aims to learn a vector representation of each node in graph, while preserving its structural information. Its usefulness has been demonstrated in various downstream applications such as node classification~\cite{} and link prediction~\cite{}.
+Recently, dramatic advancements in graph embedding have been made in many existing works, such as DeepWalk~\cite{} and node2vec~\cite{}. 
+% The usefulness of graph embeddings has been shown in various downstream applications, such as node classification and link prediction. Therefore, there have been dramatic advancements in learning graph embedding, such as DeepWalk~\cite{} and node2vec~\cite{}.
+
+As a matter of fact, a vast majority of these methods that stem from random walk significantly depend on settings of their hyper-parameters, such as the length of walk $C$ that may vary among different graphs. As a result, the tuning of $C$ involves tremendous trial-and-error and is usually time-consuming.
+Fortunately, WatchYourStep~\cite{} extends a pre-defined $C$ to a trainable attention-based context distribution parametrized by a learnable vector $\mathbf{Q}$, which aims to capture the subtle but non-trivial heterogeneity hidden in topology through an automatic manner. Such a graph attention model manages to achieve significant error reduction in different tasks~\cite{}.
+
+In spite of its capacity of considering the dissimilarity of different graphs, WatchYourStep fails to take the difference between nodes into consideration. Indeed, nodes from the same graph may play different roles displaying distinct characteristics, including the length of walk $C$. For example, a small number of nodes can have much higher degree than other nodes in a graph. Ignoring such heterogeneity is prone to cause a inferior performance.
+% For example, some nodes with a higher degree may have a larger context to look at while other more disconnected nodes may have a smaller one. As a matter of fact, a global context distribution presumes the homogeneity over various nodes, which tend to not hold water. In contrast, our method endows each node with sufficient autonomy to explore their personalized optimal context distribution parametrized by only a few learnable parameters, the quantity of which is fairly tractable.
+
+To this end, in this paper, instead of learning an attention-based context distribution for the entire graph, we therefore propose a graph embedding method that learns a context distribution for each individual node. Specifically, we parametrize a context distribution into three different forms and compare them with other state-of-the-art graph embedding methods on both link prediction and node classification tasks. Extensive experimental results indicate the superiority of our proposed method on both link prediction and node classification, which may also potentially open up a new research direction in other domains involving embedding learning such as natural language processing. 
 
 \section{Methodology}
 
@@ -201,22 +211,30 @@ To delve deeper into what vantage our personalized embedding methods provide for
 % Table for each combination of parameters, table for statistics (mean, average, and etc) of those parameters.
 
 \textbf{Analysis of personalized exponential distribution.} 
+From Table \ref{tab:analysis_q}
+
+\begin{figure}
+    \centering
+    \includegraphics{}
+    \caption{Caption}
+    \label{fig:my_label}
+\end{figure}
 
 \begin{table}
-\caption{Statistics of q}
+\caption{Statistics of q in exponential distribution}
 \label{tab:analysis_q}
 \centering
 \begin{tabular}{ccccccc}
 \toprule
 Dataset & Min  & Max & Mean & Median & Skewness & Kurtosis \\
 \midrule
-PPI & 12.01  & 1.91 & 19.28 & 19.39 \\
-Cora & 7.30  & 2.54 & 10.22 & 10.33 \\
-Citeseer & 14.38  & 6.46  & 29.49 & 123 \\
-Wikipedia & 3.47  & 1.53  & 7.10 & 6.81 \\
-Ca-Hepth & 13.63  & 14.01  & 39.67 & 37.55 \\
-Wikivote & 6.92  & 6.70  & 12.81 & 12.75\\
-Soc-facebook & 41.48  & 22.47 & 53.77 & 51.82 \\
+PPI & 5e-4  & 1.03 & 0.24 & 0.05 & 1.38 & 0.12 \\
+Cora & 7e-3  & 0.84 & 0.16 & 0.14 & 0.92 & 0.28 \\
+Citeseer & 2e-3  & 0.36  & 0.25 & 0.27 & -1.22 & 1.05 \\
+Wikipedia & 2e-5  & 0.71  & 6e-3 & 4e-4 & 10.92 & 126.92 \\
+Ca-Hepth & 5e-2  & 0.39  & 0.31 & 0.32 & -2.23 & 6.64 \\
+Wikivote & 3e-3  & 0.87  & 0.12 & 0.07 & 2.96 & 9.54\\
+Soc-facebook & 5e-4  & 0.33 & 0.12 & 0.12 & 0.03 & -0.92 \\
 
 \bottomrule
 \end{tabular}
